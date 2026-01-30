@@ -1,4 +1,4 @@
-**# CheckMate**
+# CHECKMATE
 
 ## Screenshots
 
