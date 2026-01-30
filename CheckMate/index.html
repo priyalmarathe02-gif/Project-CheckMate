@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheckMate - To-Do List</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="bgBlobs" class="animated-bg"></canvas>
+  <div class="container">
+    <header>
+      <h1>CheckMate</h1>
+      <p>Your elegant productivity companion</p>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+    </header>
+
+    <div class="input-section">
+      <input type="text" id="taskInput" placeholder="Add your new task...">
+      <button id="addTaskBtn">Add Task</button>
+    </div>
+
+
+    <div id="taskCounter" style="text-align:center; margin-bottom:20px; font-weight:600;"></div>
+    <ul id="taskList"></ul>
+
+    <footer>
+      &copy; 2026 CheckMate | Stay organized, stay productive
+    </footer>
+  </div>
+
+  <script>
+    // Bold, moving, blurred blobs background (faster, more dynamic, more visible)
+    const canvas = document.getElementById('bgBlobs');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    // Blob definitions (colors read from CSS variables so they sync with theme)
+    function getBlobColors() {
+      const s = getComputedStyle(document.documentElement);
+      return [
+        s.getPropertyValue('--blob1').trim() || '#FFB7C5',
+        s.getPropertyValue('--blob2').trim() || '#000000',
+        s.getPropertyValue('--blob3').trim() || '#FFB7C5',
+        s.getPropertyValue('--blob4').trim() || '#000000'
+      ];
+    }
+    const blobColors = getBlobColors();
+    const blobs = [
+      { color: blobColors[0], r: 320, x: 0.2, y: 0.3, dx: 0.18, dy: 0.13, blur: 60, phase: Math.random() * 100 },
+      { color: blobColors[1], r: 260, x: 0.8, y: 0.7, dx: -0.15, dy: 0.17, blur: 40, phase: Math.random() * 100 },
+      { color: blobColors[2], r: 200, x: 0.7, y: 0.2, dx: 0.13, dy: -0.12, blur: 30, phase: Math.random() * 100 },
+      { color: blobColors[3], r: 180, x: 0.3, y: 0.8, dx: -0.12, dy: -0.13, blur: 20, phase: Math.random() * 100 }
+    ];
+    function updateBlobColors() {
+      const colors = getBlobColors();
+      blobs.forEach((b, i) => b.color = colors[i]);
+    }
+    window.updateBlobColors = updateBlobColors;
+    let lastTime = 0;
+    function animateBlobs(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const dt = (time - lastTime) * 0.001 || 0.016;
+      lastTime = time;
+      blobs.forEach(blob => {
+        // Add smooth oscillation to movement
+        const t = time * 0.0003 + blob.phase;
+        blob.x += Math.sin(t) * blob.dx * dt;
+        blob.y += Math.cos(t) * blob.dy * dt;
+        // Bounce off edges
+        if (blob.x < 0.1) blob.x = 0.1;
+        if (blob.x > 0.9) blob.x = 0.9;
+        if (blob.y < 0.1) blob.y = 0.1;
+        if (blob.y > 0.9) blob.y = 0.9;
+        // Draw
+        ctx.save();
+        ctx.globalAlpha = 0.24; // less glowy
+        ctx.filter = `blur(${Math.max(blob.blur * 0.45, 8)}px)`; // less blur
+        ctx.beginPath();
+        ctx.arc(blob.x * canvas.width, blob.y * canvas.height, blob.r, 0, 2 * Math.PI);
+        ctx.fillStyle = blob.color;
+        ctx.fill();
+        ctx.restore();
+      });
+      requestAnimationFrame(animateBlobs);
+    }
+    animateBlobs();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
