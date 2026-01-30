@@ -1,4 +1,4 @@
-# CHECKMATE
+# PROJECT CHECKMATE
 
 ## Screenshots
 
